@@ -1,14 +1,10 @@
 const mongoose = require("mongoose");
 
 const connectDB = () => {
-  try {
-    mongoose.connect(process.env.DATABASE_URI, {
-      useUnifiedTopology: true,
-      useNewUrlParser: true,
-    });
-  } catch (err) {
-    console.log(err);
-  }
+  mongoose.connect(process.env.DB_CONNECT, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
 };
 
 module.exports = connectDB;

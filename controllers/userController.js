@@ -1,34 +1,51 @@
-const User = require("../models/User");
+const User = require("../model/User");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { registerValidation, loginValidation } = require("../config/validation");
 
 const registerUser = async (req, res) => {
-  const { email, password, fullName } = req.body;
+  //Validate body
+  const { error } = registerValidation(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
 
-  if (!email || !password || !fullName)
-    return res
-      .sendStatus(400)
-      .json({ message: "Email and password and fullName are required." });
+  //Check if email already exists
+  const emailExist = await User.findOne({ email: req.body.email });
+  if (emailExist) return res.status(409).send("Email already exists");
 
-  const duplicate = await User.findOne({ email: email }).exec();
-  if (duplicate) return res.sendStatus(409);
+  //Hash password
+  const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+  //Create and save user
+  const user = new User({
+    name: req.body.name,
+    email: req.body.email,
+    password: hashedPassword,
+  });
 
   try {
-    //Encrypt the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    //Create and store the new user
-    const result = await User.create({
-      email: email,
-      password: hashedPassword,
-      fullName: fullName,
-    });
-
-    console.log(result);
-
-    res.status(201).json({ message: `New user ${email} was created` });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    const savedUser = await user.save();
+    return res.status(201).send(savedUser);
+  } catch (error) {
+    return res.status(500).send(error);
   }
 };
 
-module.exports = { registerUser };
+const loginUser = async (req, res) => {
+  //Validate body
+  const { error } = loginValidation(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  //Check if user exists by email
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) return res.status(404).send("Email not found");
+
+  //Check password
+  const validPassword = await bcrypt.compare(req.body.password, user.password);
+  if (!validPassword) return res.status(400).send("Invalid password");
+
+  //Create token
+  const token = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET);
+  return res.header("auth-token", token);
+};
+
+module.exports = { registerUser, loginUser };

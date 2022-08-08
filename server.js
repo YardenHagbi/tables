@@ -13,9 +13,8 @@ app.use(express.json()); //JSON
 app.use(express.urlencoded({ extended: false })); //Handle urlencoded form data
 
 //Routes
-app.use("/register", require("./routes/register"));
+app.use("/user", require("./routes/user"));
 
 mongoose.connection.once("open", () => {
-  console.log("DB connected");
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 });
