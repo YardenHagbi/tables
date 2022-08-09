@@ -2,6 +2,7 @@ const User = require("../model/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { registerValidation, loginValidation } = require("../config/validation");
+const { Role } = require("../model/enums");
 
 const registerUser = async (req, res) => {
   //Validate body
@@ -16,18 +17,17 @@ const registerUser = async (req, res) => {
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
   //Create and save user
-  const user = new User({
+  const savedUser = await User.create({
     name: req.body.name,
     email: req.body.email,
     password: hashedPassword,
+    role: Role.TRIAL,
   });
 
-  try {
-    const savedUser = await user.save();
-    return res.status(201).send(savedUser);
-  } catch (error) {
-    return res.status(500).send(error);
-  }
+  //Create token
+  const token = createToken(savedUser);
+
+  return res.status(201).header("auth-token", token).send(savedUser);
 };
 
 const loginUser = async (req, res) => {
@@ -44,8 +44,13 @@ const loginUser = async (req, res) => {
   if (!validPassword) return res.status(400).send("Invalid password");
 
   //Create token
-  const token = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET);
-  return res.header("auth-token", token);
+  const token = createToken(user);
+
+  return res.header("auth-token", token).sendStatus(204);
 };
+
+function createToken(user) {
+  return jwt.sign({ id: user._id, role: user.role }, process.env.TOKEN_SECRET);
+}
 
 module.exports = { registerUser, loginUser };
