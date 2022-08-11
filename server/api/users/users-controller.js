@@ -1,14 +1,9 @@
-const User = require("../model/User");
+const User = require("../../model/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { registerValidation, loginValidation } = require("../config/validation");
-const { Role } = require("../model/enums");
+const { UserRole } = require("../../model/enums");
 
-const registerUser = async (req, res) => {
-  //Validate body
-  const { error } = registerValidation(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
+async function registerUser(req, res) {
   //Check if email already exists
   const emailExist = await User.findOne({ email: req.body.email });
   if (emailExist) return res.status(409).send("Email already exists");
@@ -21,20 +16,16 @@ const registerUser = async (req, res) => {
     name: req.body.name,
     email: req.body.email,
     password: hashedPassword,
-    role: Role.TRIAL,
+    role: UserRole.TRIAL,
   });
 
   //Create token
   const token = createToken(savedUser);
 
   return res.status(201).header("auth-token", token).send(savedUser);
-};
+}
 
-const loginUser = async (req, res) => {
-  //Validate body
-  const { error } = loginValidation(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
+async function loginUser(req, res) {
   //Check if user exists by email
   const user = await User.findOne({ email: req.body.email });
   if (!user) return res.status(404).send("Email not found");
@@ -47,7 +38,7 @@ const loginUser = async (req, res) => {
   const token = createToken(user);
 
   return res.header("auth-token", token).sendStatus(204);
-};
+}
 
 function createToken(user) {
   return jwt.sign({ id: user._id, role: user.role }, process.env.TOKEN_SECRET);
