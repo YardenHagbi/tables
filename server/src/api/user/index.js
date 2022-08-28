@@ -10,8 +10,8 @@ const {
 const router = AsyncRouter();
 
 router.get("/", authToken, controller.getUserFromToken);
+router.put("/", authToken, updateUserValidator, controller.updateUser);
 router.post("/login", loginValidator, controller.loginUser);
 router.post("/register", registerValidator, controller.registerUser);
-router.post("/update", authToken, updateUserValidator, controller.updateUser);
 
 module.exports = router;

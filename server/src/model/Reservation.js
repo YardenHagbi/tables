@@ -24,11 +24,11 @@ const paymentSchema = new Schema({
 });
 
 const reservationSchema = new Schema({
-  userId: { type: mongoose.Types.ObjectId, ref: "User", required: true },
+  user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   createdDate: { type: Date, default: Date.now() },
   startDate: { type: Date, required: true },
   endDate: { type: Date },
-  table_Id: { type: mongoose.Types.ObjectId, ref: "Table", required: true },
+  table: { type: Schema.Types.ObjectId, ref: "Table", required: true },
   client: clientSchema,
   status: { type: Number, enum: ReservationStatus, required: true },
   actions: [actionSchema],

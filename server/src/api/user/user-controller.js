@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { UserRole, UserSubscription, Status } = require("../../model/enums");
 
-const getUserFromToken = async (req, res) => {
+const getUser = async (req, res) => {
   const user = await User.findById(req.user.id);
   if (!user) return res.status(404).send("User not found");
 
@@ -67,4 +67,9 @@ const createToken = (user) =>
 
 const hashPassword = (password) => bcrypt.hash(password, 10);
 
-module.exports = { loginUser, getUserFromToken, registerUser, updateUser };
+module.exports = {
+  loginUser,
+  getUserFromToken: getUser,
+  registerUser,
+  updateUser,
+};
