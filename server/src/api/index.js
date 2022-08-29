@@ -1,4 +1,5 @@
 const { AsyncRouter } = require("express-async-router");
+const { authToken } = require("../middleware/auth");
 const router = AsyncRouter();
 
 //health
