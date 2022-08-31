@@ -20,9 +20,9 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - run: npm install
-        working-directory: ${{end.working-directory}}
+        working-directory: ${{env.working-directory}}
       - run: npm test --if-present
-        working-directory: ${{end.working-directory}}
+        working-directory: ${{env.working-directory}}
       - uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
