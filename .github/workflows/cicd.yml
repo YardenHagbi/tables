@@ -11,7 +11,7 @@ env:
 
 defaults:
   run:
-    working-directory: ./server # Run on server directory
+    working-directory: server # Run on server directory
 
 jobs:
   build_and_deploy:
