@@ -12,9 +12,10 @@ env:
 jobs:
   build and deploy:
     runs-on: ubuntu-latest
-    steps:
-      -uses:
+    defaults:
+      run:
         working-directory: server # Run on server directory
+    steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
