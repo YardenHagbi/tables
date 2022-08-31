@@ -13,7 +13,7 @@ jobs:
   build and deploy:
     runs-on: ubuntu-latest
     steps:
-      -run:
+      -uses:
         working-directory: server # Run on server directory
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
